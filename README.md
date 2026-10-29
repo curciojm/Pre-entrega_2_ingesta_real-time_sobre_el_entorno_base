@@ -304,7 +304,3 @@ Para revisar qué recursos se eliminarían y, si corresponde, destruir la infrae
 terraform plan -destroy
 terraform destroy
 ```
-
-Antes de confirmar la destrucción, revisar el plan que muestra Terraform. Estos comandos no eliminan el código del repositorio ni los recursos del backend que fueron creados fuera de esta configuración.
-
-**Importante:** no ejecutar estos comandos como parte de la validación normal de la entrega. La infraestructura desplegada puede seguir siendo necesaria para realizar pruebas o presentar evidencias.
