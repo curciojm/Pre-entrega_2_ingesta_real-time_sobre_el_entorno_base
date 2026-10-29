@@ -27,13 +27,12 @@ output "firehose_delivery_stream_arn" {
   description = "ARN del delivery stream de Firehose"
   value       = module.ingestion.firehose_delivery_stream_arn
 }
-# hay que pasarle a ingestion firehose el nombre asi lo conecta
+
 output "s3_bucket_arn" {
   description = "ARN del bucket S3 Data Lake Bronze"
   value       = aws_s3_bucket.bronze.arn
 }
 
-# Totalmente opcional lo siguiente. Lo que esta en main en root no es necesario exponer
 output "cloudwatch_metric_alarm_arn" {
   description = "ARN de la alarma de throttling de escritura de Kinesis"
   value       = aws_cloudwatch_metric_alarm.kinesis_write_throttling.arn

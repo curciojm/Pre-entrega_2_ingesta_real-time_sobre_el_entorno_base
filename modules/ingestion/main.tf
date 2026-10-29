@@ -24,7 +24,6 @@ resource "aws_iam_role_policy" "firehose_policy" {
     Version = "2012-10-17"
 
     Statement = [
-      # Firehose puede leer del stream de Kinesis
       {
         Effect = "Allow"
         Action = [
@@ -37,7 +36,6 @@ resource "aws_iam_role_policy" "firehose_policy" {
         Resource = aws_kinesis_stream.kinesis_ingest_stream.arn
       },
 
-      # Permisos sobre el bucket S3 Bronze
       {
         Effect = "Allow"
         Action = [
@@ -48,18 +46,16 @@ resource "aws_iam_role_policy" "firehose_policy" {
         Resource = var.data_bucket_arn_s3
       },
 
-      # Permisos sobre los objetos del bucket
       {
         Effect = "Allow"
         Action = [
           "s3:AbortMultipartUpload",
-          "s3:GetObject", # s el permiso para leer u obtener un objeto almacenado en S3. Por ejemplo, descargar un archivo JSON o Parquet de un bucket
+          "s3:GetObject",
           "s3:PutObject"
         ]
         Resource = "${var.data_bucket_arn_s3}/*"
       },
 
-      # Permiso para publicar eventos en el stream de logs
       {
         Effect = "Allow"
         Action = [
@@ -68,7 +64,6 @@ resource "aws_iam_role_policy" "firehose_policy" {
         Resource = aws_cloudwatch_log_stream.firehose.arn
       },
 
-      # Permiso para describir streams de logs del grupo
       {
         Effect = "Allow"
         Action = [
@@ -106,17 +101,15 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose_delivery_stream" {
   name        = "${var.environment}-firehose-delivery-stream"
   destination = "extended_s3"
 
-  # Origen: Kinesis Data Streams
   kinesis_source_configuration {
     kinesis_stream_arn = aws_kinesis_stream.kinesis_ingest_stream.arn
     role_arn           = aws_iam_role.firehose_role.arn
   }
 
-  # Destino: S3 Bronze
   extended_s3_configuration {
     bucket_arn = var.data_bucket_arn_s3
     role_arn   = aws_iam_role.firehose_role.arn
-    # esto define la estructura del lake
+
     prefix = "bronze/ingestion/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/"
 
     error_output_prefix = "bronze/errors/!{firehose:error-output-type}/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/"
@@ -132,7 +125,6 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose_delivery_stream" {
     }
   }
 
-  # Asegura que la política esté asociada antes de crear Firehose
   depends_on = [
     aws_iam_role_policy.firehose_policy
   ]
