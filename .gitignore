@@ -8,6 +8,8 @@
 # Variables locales o sensibles
 *.tfvars
 *.tfvars.json
+.env
+.env.*
 
 # Archivos de crash
 crash.log
@@ -24,4 +26,14 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 
-.venv
+# Configuración local de Terraform
+.terraformrc
+terraform.rc
+
+# Entornos virtuales de Python
+.venv/
+venv/
+
+# Caché de Python
+__pycache__/
+*.py[cod]

@@ -116,7 +116,7 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose_delivery_stream" {
   extended_s3_configuration {
     bucket_arn = var.data_bucket_arn_s3
     role_arn   = aws_iam_role.firehose_role.arn
-
+    # esto define la estructura del lake
     prefix = "bronze/ingestion/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/"
 
     error_output_prefix = "bronze/errors/!{firehose:error-output-type}/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/"
