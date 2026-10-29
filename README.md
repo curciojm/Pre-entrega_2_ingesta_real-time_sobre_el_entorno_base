@@ -41,11 +41,13 @@ La estructura conserva la organización de la pre-entrega anterior y agrega los 
 │   └── ingestion/
 ├── enviroments/
 │   └── dev/
+│       ├── .terraform.lock.hcl
 │       ├── backend.tf
 │       ├── main.tf
-│       ├── variables.tf
+│       ├── outputs.tf
+│       ├── provider.tf
 │       ├── terraform.tfvars.example
-│       └── outputs.tf
+│       └── variables.tf
 ├── producer.py
 ├── requirements.txt
 ├── .gitignore
