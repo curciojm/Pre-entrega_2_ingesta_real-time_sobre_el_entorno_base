@@ -85,6 +85,7 @@ resource "aws_kinesis_stream" "kinesis_ingest_stream" {
   shard_count      = 2
   retention_period = 48
   encryption_type  = "KMS"
+  kms_key_id = "alias/aws/kinesis"
 
   stream_mode_details {
     stream_mode = "PROVISIONED"
@@ -117,6 +118,9 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose_delivery_stream" {
     role_arn   = aws_iam_role.firehose_role.arn
 
     prefix = "bronze/ingestion/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/"
+
+    error_output_prefix = "bronze/errors/!{firehose:error-output-type}/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/"
+
 
     buffering_size     = 5
     buffering_interval = 60
