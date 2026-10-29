@@ -12,7 +12,7 @@ La prueba de ingesta utiliza un productor en Python que genera eventos simulados
 
 El flujo de datos implementado es el siguiente:
 
-```text
+```
 Productor Python
        |
        v
@@ -23,6 +23,7 @@ Kinesis Data Firehose
        |
        v
 Amazon S3 — Bronze
+
 ```
 
 CloudWatch registra logs de entrega de Firehose y monitorea las métricas de lectura y escritura de Kinesis mediante dos alarmas.
@@ -33,7 +34,7 @@ Kinesis Data Streams funciona como capa de recepción de eventos. Firehose consu
 
 La estructura conserva la organización de la pre-entrega anterior y agrega los recursos de ingesta:
 
-```text
+```
 .
 ├── modules/
 │   ├── network/
@@ -52,6 +53,7 @@ La estructura conserva la organización de la pre-entrega anterior y agrega los 
 ├── requirements.txt
 ├── .gitignore
 └── README.md
+
 ```
 
 > El directorio se llama `enviroments/dev` en este repositorio. La estructura anterior es esquemática: los archivos y módulos deben corresponder a los existentes en el repositorio.
@@ -60,8 +62,10 @@ La estructura conserva la organización de la pre-entrega anterior y agrega los 
 
 - Terraform instalado.
 - AWS CLI instalado y configurado con credenciales que permitan administrar los recursos definidos.
-- Python instalado.
+- Python 3.14 instalado.
 - Dependencias de Python instaladas desde `requirements.txt`.
+
+La prueba del proyecto se realizó con **Python 3.14**.
 - Acceso a la cuenta de AWS y a la región `us-east-2`.
 - Bucket S3 y tabla DynamoDB previamente creados para el backend remoto de Terraform.
 
@@ -71,11 +75,13 @@ Las credenciales de AWS deben configurarse localmente mediante AWS CLI u otro me
 
 El repositorio incluye `terraform.tfvars.example` como plantilla de configuración. El archivo local `terraform.tfvars` está excluido de Git mediante `.gitignore`.
 
-Desde la raíz del repositorio, crear el archivo local:
+Desde la raíz del repositorio, abrir **PowerShell** y crear el archivo local:
 
 ```powershell
 Copy-Item enviroments/dev/terraform.tfvars.example enviroments/dev/terraform.tfvars
 ```
+
+> Si se utiliza Git Bash, el equivalente es `cp enviroments/dev/terraform.tfvars.example enviroments/dev/terraform.tfvars`.
 
 El archivo de ejemplo contiene los siguientes parámetros:
 
@@ -92,7 +98,7 @@ Los valores de referencia corresponden al entorno `dev` de esta entrega. El nomb
 
 Desde la raíz del repositorio, ejecutar:
 
-```powershell
+```
 cd enviroments/dev
 terraform init
 terraform validate
@@ -107,7 +113,7 @@ terraform apply
 
 Para consultar los identificadores de los recursos desplegados:
 
-```powershell
+```
 terraform output
 ```
 
@@ -117,14 +123,14 @@ terraform output
 
 Se crea el stream `dev-kinesis-ingest-stream` con la siguiente configuración:
 
-| Característica | Configuración |
-|---|---|
-| Nombre | `dev-kinesis-ingest-stream` |
-| Modo de capacidad | Provisionado (`PROVISIONED`) |
-| Shards | 2 |
-| Retención | 48 horas |
-| Cifrado | KMS |
-| Región | `us-east-2` |
+| **Característica** | **Configuración**            |
+| ------------------ | ---------------------------- |
+| Nombre             | `dev-kinesis-ingest-stream`  |
+| Modo de capacidad  | Provisionado (`PROVISIONED`) |
+| Shards             | 2                            |
+| Retención          | 48 horas                     |
+| Cifrado            | KMS                          |
+| Región             | `us-east-2`                  |
 
 El productor Python envía los eventos al stream mediante la operación `PutRecords`, agrupándolos en lotes de hasta 100 registros por solicitud.
 
@@ -140,31 +146,33 @@ El productor utiliza claves de partición generadas mediante UUID para distribui
 
 Se configura el stream de entrega `dev-firehose-delivery-stream`, que utiliza `dev-kinesis-ingest-stream` como origen y el bucket S3 Bronze como destino.
 
-| Característica | Configuración |
-|---|---|
-| Stream de entrega | `dev-firehose-delivery-stream` |
-| Origen | Kinesis Data Streams |
-| Destino | Amazon S3 |
-| Buffer por tamaño | 5 MB |
-| Intervalo de buffer | 60 segundos |
+| **Característica**  | **Configuración**              |
+| ------------------- | ------------------------------ |
+| Stream de entrega   | `dev-firehose-delivery-stream` |
+| Origen              | Kinesis Data Streams           |
+| Destino             | Amazon S3                      |
+| Buffer por tamaño   | 5 MB                           |
+| Intervalo de buffer | 60 segundos                    |
 
 Firehose agrupa los registros antes de escribirlos en S3, por lo que la entrega no es necesariamente inmediata para cada evento individual.
 
 Los objetos se almacenan utilizando la siguiente estructura de prefijos:
 
-```text
+```
 bronze/
 └── ingestion/
     └── year=YYYY/
         └── month=MM/
             └── day=DD/
                 └── objeto-generado-por-firehose
+
 ```
 
 La configuración también define un prefijo separado para los registros de entrega que presentan errores:
 
-```text
+```
 bronze/errors/
+
 ```
 
 La partición por fecha corresponde al momento de entrega utilizado por Firehose, no necesariamente a la fecha de generación de cada evento.
@@ -200,9 +208,9 @@ El grupo tiene una retención configurada de 7 días y utiliza el stream de logs
 
 Además, se definen dos alarmas de CloudWatch para monitorear el stream de Kinesis:
 
-| Alarma | Métrica |
-|---|---|
-| `dev-kinesis-read-throughput-exceeded` | `ReadProvisionedThroughputExceeded` |
+| **Alarma**                              | **Métrica**                          |
+| --------------------------------------- | ------------------------------------ |
+| `dev-kinesis-read-throughput-exceeded`  | `ReadProvisionedThroughputExceeded`  |
 | `dev-kinesis-write-throughput-exceeded` | `WriteProvisionedThroughputExceeded` |
 
 Estas alarmas permiten detectar eventos de limitación de lectura o escritura asociados a la capacidad provisionada de Kinesis.
@@ -211,13 +219,13 @@ Estas alarmas permiten detectar eventos de limitación de lectura o escritura as
 
 Una vez desplegada la infraestructura y configuradas las credenciales de AWS, instalar las dependencias desde el directorio que contiene `requirements.txt`:
 
-```powershell
+```
 pip install -r requirements.txt
 ```
 
 Luego, ejecutar el productor desde el directorio donde se encuentra `producer.py`:
 
-```powershell
+```
 python producer.py
 ```
 
@@ -227,8 +235,9 @@ El productor informa la cantidad de registros aceptados por Kinesis en el primer
 
 La ejecución de prueba produjo el siguiente resultado:
 
-```text
+```
 Registros procesados por Kinesis: 100/100 en el primer intento
+
 ```
 
 Esto confirma que Kinesis aceptó los 100 registros enviados en esa ejecución.
@@ -239,9 +248,10 @@ Después de ejecutar el productor, se verificó la actividad de Firehose en AWS 
 
 El objeto comprobado se encontraba en el siguiente prefijo:
 
-```text
+```
 s3://entrega2-bronze-dev-2026/
   bronze/ingestion/year=2026/month=10/day=29/
+
 ```
 
 El objeto tenía un tamaño aproximado de 4 KB y contenía registros JSON con los campos `EVENT_TIME`, `TICKER` y `PRICE`.
@@ -282,17 +292,17 @@ Las credenciales deben configurarse localmente y no deben incluirse en el reposi
 
 La configuración expone los siguientes outputs:
 
-| Output | Descripción |
-|---|---|
-| `vpc_id` | ID de la VPC |
-| `private_subnet_ids` | IDs de las subredes privadas |
-| `streaming_processor_role_arn` | ARN del rol de procesamiento |
-| `audit_role_arn` | ARN del rol de auditoría |
-| `kinesis_ingest_stream_arn` | ARN del stream de Kinesis |
-| `firehose_delivery_stream_arn` | ARN del stream de entrega de Firehose |
-| `s3_bucket_arn` | ARN del bucket de destino |
-| `cloudwatch_metric_alarm_arn` | ARN de la alarma de escritura de Kinesis |
-| `cloudwatch_metric_alarm_read_arn` | ARN de la alarma de lectura de Kinesis |
+| **Output**                         | **Descripción**                          |
+| ---------------------------------- | ---------------------------------------- |
+| `vpc_id`                           | ID de la VPC                             |
+| `private_subnet_ids`               | IDs de las subredes privadas             |
+| `streaming_processor_role_arn`     | ARN del rol de procesamiento             |
+| `audit_role_arn`                   | ARN del rol de auditoría                 |
+| `kinesis_ingest_stream_arn`        | ARN del stream de Kinesis                |
+| `firehose_delivery_stream_arn`     | ARN del stream de entrega de Firehose    |
+| `s3_bucket_arn`                    | ARN del bucket de destino                |
+| `cloudwatch_metric_alarm_arn`      | ARN de la alarma de escritura de Kinesis |
+| `cloudwatch_metric_alarm_read_arn` | ARN de la alarma de lectura de Kinesis   |
 
 Estos outputs permiten consultar los identificadores generados por Terraform sin tener que codificarlos manualmente en otros recursos.
 
@@ -300,7 +310,9 @@ Estos outputs permiten consultar los identificadores generados por Terraform sin
 
 Para revisar qué recursos se eliminarían y, si corresponde, destruir la infraestructura administrada por Terraform:
 
-```powershell
 terraform plan -destroy
 terraform destroy
-```
+
+Importante: si se ejecutó producer.py y Firehose entregó registros al bucket S3 de destino, el bucket puede contener objetos que impidan su eliminación. En ese caso, antes de volver a ejecutar terraform destroy, es necesario eliminar el contenido del bucket desde la consola de AWS (Amazon S3), verificando previamente que los datos puedan descartarse.
+
+La eliminación de los objetos no se realiza automáticamente con la configuración actual de Terraform. El bucket del backend remoto de Terraform y la tabla DynamoDB utilizados para el estado y el bloqueo no forman parte de los recursos administrados por esta configuración, por lo que deben conservarse para mantener el estado del proyecto.
