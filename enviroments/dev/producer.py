@@ -5,10 +5,9 @@ import datetime
 import random
 import uuid
 
-
 class KinesisProducerConsumer:
     def __init__(self, stream_name):
-        self.kinesis = boto3.client('kinesis')
+        self.kinesis = boto3.client("kinesis", region_name="us-east-2")
         self.stream_name = stream_name
 
     

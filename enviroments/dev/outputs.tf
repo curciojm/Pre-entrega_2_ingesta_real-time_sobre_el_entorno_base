@@ -33,7 +33,13 @@ output "s3_bucket_arn" {
   value       = aws_s3_bucket.bronze.arn
 }
 
+# Totalmente opcional lo siguiente. Lo que esta en main en root no es necesario exponer
 output "cloudwatch_metric_alarm_arn" {
   description = "ARN de la alarma de throttling de escritura de Kinesis"
   value       = aws_cloudwatch_metric_alarm.kinesis_write_throttling.arn
+}
+
+output "cloudwatch_metric_alarm_read_arn" {
+  description = "ARN de la alarma de throttling de lectura de Kinesis"
+  value       = aws_cloudwatch_metric_alarm.kinesis_read_throttling.arn
 }

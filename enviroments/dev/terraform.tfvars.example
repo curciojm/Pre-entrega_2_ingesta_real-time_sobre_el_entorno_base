@@ -1,6 +1,9 @@
-environment      = "dev"
-region           = "us-east-2"
-cidr_vpc         = "10.0.0.0/16"
-data_bucket_name = "juan-terraform-data-2026"
+environment = "dev"
+region      = "us-east-2"
+cidr_vpc    = "10.0.0.0/16"
+
+# Bucket para los datos de la ingesta
+data_bucket_name = "entrega2-bronze-dev-2026"
+
 private_subnet_1_cidr = "10.0.1.0/24"
 private_subnet_2_cidr = "10.0.2.0/24"

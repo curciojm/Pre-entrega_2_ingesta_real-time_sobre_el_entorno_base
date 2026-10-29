@@ -9,7 +9,7 @@ resource "aws_vpc" "main" {
 
 resource "aws_subnet" "private_1" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        =  var.private_subnet_1_cidr
+  cidr_block        = var.private_subnet_1_cidr
   availability_zone = "${var.region}a"
 
   tags = {

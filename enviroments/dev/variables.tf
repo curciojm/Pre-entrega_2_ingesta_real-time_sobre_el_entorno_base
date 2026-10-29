@@ -27,7 +27,3 @@ variable "private_subnet_2_cidr" {
   type        = string
   description = "CIDR de la segunda subred privada."
 }
-
-variable "data_bucket_arn_s3" {
-  type = string
-}

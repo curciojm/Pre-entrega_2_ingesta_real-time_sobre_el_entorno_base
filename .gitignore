@@ -16,6 +16,7 @@ crash.*.log
 # Planes guardados
 *.tfplan
 tfplan
+tfplan.txt
 
 # Overrides locales
 override.tf
