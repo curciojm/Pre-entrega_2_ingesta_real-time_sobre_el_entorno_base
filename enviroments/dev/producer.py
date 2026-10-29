@@ -30,6 +30,11 @@ class KinesisProducerConsumer:
                 StreamName=self.stream_name,
                 Records=records
             )
+            print(
+                f"Registros procesados por Kinesis: "
+                f"{len(response['Records']) - response['FailedRecordCount']}/"
+                f"{len(records)} en el primer intento"
+            )
 
             failed_count = response["FailedRecordCount"]
 
@@ -66,6 +71,7 @@ class KinesisProducerConsumer:
                         f"Advertencia: quedaron {len(failed_records)} "
                         "registros sin enviar."
                     )
+
 
     def simple_consumer(self, shard_id):
         response = self.kinesis.get_shard_iterator(
@@ -106,3 +112,4 @@ if __name__ == "__main__":
     ]
 
     app.producer_efficient_batch(events)
+    
