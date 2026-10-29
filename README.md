@@ -310,9 +310,11 @@ Estos outputs permiten consultar los identificadores generados por Terraform sin
 
 Para revisar qué recursos se eliminarían y, si corresponde, destruir la infraestructura administrada por Terraform:
 
+```bash
 terraform plan -destroy
 terraform destroy
+```
 
-Importante: si se ejecutó producer.py y Firehose entregó registros al bucket S3 de destino, el bucket puede contener objetos que impidan su eliminación. En ese caso, antes de volver a ejecutar terraform destroy, es necesario eliminar el contenido del bucket desde la consola de AWS (Amazon S3), verificando previamente que los datos puedan descartarse.
+**Importante:** si se ejecutó `producer.py` y Firehose entregó registros al bucket S3 de destino, el bucket puede contener objetos que impidan su eliminación. En ese caso, antes de volver a ejecutar `terraform destroy`, es necesario eliminar el contenido del bucket desde la consola de AWS (Amazon S3), verificando previamente que los datos puedan descartarse.
 
 La eliminación de los objetos no se realiza automáticamente con la configuración actual de Terraform. El bucket del backend remoto de Terraform y la tabla DynamoDB utilizados para el estado y el bloqueo no forman parte de los recursos administrados por esta configuración, por lo que deben conservarse para mantener el estado del proyecto.
